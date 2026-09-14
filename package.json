@@ -11,7 +11,11 @@
     "build": "turbo run build",
     "lint": "turbo run lint",
     "test": "turbo run test",
-    "format": "prettier --write \"**/*.{ts,tsx,md,json}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
+    "db:up": "docker compose up -d db",
+    "db:down": "docker compose down",
+    "db:migrate": "pnpm --filter @eterna/api run prisma:migrate",
+    "db:studio": "pnpm --filter @eterna/api run prisma:studio"
   },
   "devDependencies": {
     "prettier": "^3.3.3",
