@@ -1,11 +1,10 @@
 import type { INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import type { App } from 'supertest/types';
 import { PrismaService } from '../src/prisma/prisma.service.js';
 import { bootstrapTestApp } from './utils/bootstrap-app.js';
 
 describe('Auth (e2e)', () => {
-  let app: INestApplication<App>;
+  let app: INestApplication;
   let prisma: PrismaService;
 
   const email = `auth-e2e-${Date.now()}@stockflow.test`;
