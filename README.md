@@ -2,7 +2,7 @@
 
 A minimal Inventory & Invoicing system. Monorepo with a NestJS API and a React (Vite) frontend, managed with pnpm workspaces and Turborepo.
 
-> This README covers the monorepo scaffold. Full setup/usage docs (env vars, demo credentials, tech choices, trade-offs) land once the core features are built — see the project plan.
+> This README covers setup and day-to-day commands. Full docs (demo credentials, tech-choice write-up, trade-offs, AI usage) land once the core features are built.
 
 ## Layout
 
@@ -22,38 +22,33 @@ packages/
 
 ## Getting started
 
+One `.env` at the repo root covers everything — Postgres, the API, and the web app all read from it. There's nothing per-app to copy.
+
 ```bash
 pnpm install
-cp .env.example .env                       # docker-compose Postgres credentials
-cp apps/api/.env.example apps/api/.env      # API runtime config — see comments in the file
-pnpm db:up                                  # starts Postgres in Docker
-pnpm --filter @eterna/api run prisma:migrate  # applies the schema
-pnpm dev                                    # runs api + web in parallel via Turborepo
+cp .env.example .env                          # one file for the whole project — see comments in it
+pnpm db:up                                     # starts Postgres in Docker
+pnpm --filter @eterna/api run prisma:migrate   # applies the schema
+pnpm dev                                       # runs api + web in parallel via Turborepo
 ```
 
 - API: http://localhost:3000 (health check at `/health`, API docs at `/api/docs`)
 - Web: http://localhost:5173
 
-Copy `apps/web/.env.example` to `apps/web/.env` to override `VITE_API_URL` if the API runs on a different host/port.
-
-**Note:** `apps/api/.env.example` defaults the Postgres port to `55432` rather than the standard `5432`/`5433`, because this project's dev machine already had native Postgres services bound to both. Adjust `POSTGRES_PORT` (root `.env`) and the port in `DATABASE_URL` (`apps/api/.env`) together if you need a different port.
+**Note:** `.env.example` defaults the Postgres port to `55432` rather than the standard `5432`/`5433`, because this project's dev machine already had native Postgres services bound to both. Change `POSTGRES_PORT` and the port inside `DATABASE_URL` together if you need a different one.
 
 ## Other commands
 
-```bash
-pnpm build    # build all apps/packages
-pnpm lint     # lint all apps/packages
-pnpm test     # unit tests for all apps/packages
-```
-
-## Running the API's tests
+Every command below runs from the repo root and fans out to every app/package via Turborepo — no `cd` needed.
 
 ```bash
-cd apps/api
-cp .env.test.example .env.test   # separate DB so tests never touch dev data
-pnpm test          # unit tests (no DB required)
-pnpm test:e2e      # integration tests — auto-creates/migrates the test DB first
+pnpm build      # build all apps/packages
+pnpm lint       # lint all apps/packages
+pnpm test       # unit tests (no DB needed)
+pnpm test:e2e   # integration tests — no setup needed, no Docker/Postgres involved
 ```
+
+`pnpm test:e2e` runs the API's integration tests against a disposable local SQLite file that's wiped and recreated on every run (`apps/api/prisma/setup-test-db.ts`). This is deliberately separate from dev/prod, which always use real Postgres — Prisma ties one schema file to one database provider, so a from-scratch SQLite file is the fastest way to get real integration tests without needing Docker just to run the test suite. There's no env file to copy for this: sensible defaults are baked into `apps/api/test/setup-env.ts`.
 
 ## Adding a new app or package
 

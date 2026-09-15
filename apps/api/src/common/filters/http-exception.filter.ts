@@ -7,7 +7,23 @@ import {
   Logger,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
-import { Prisma } from '../../generated/prisma/client.js';
+
+interface PrismaKnownRequestError extends Error {
+  code: string;
+}
+
+// Duck-typed rather than `instanceof Prisma.PrismaClientKnownRequestError`:
+// the dev/prod app and the test suite generate Prisma Client from different
+// datasources (Postgres vs. the SQLite test schema — see
+// prisma/setup-test-db.ts), so they don't share the same class reference.
+// The error `code`s (P2002, P2025, ...) are stable across providers.
+function isPrismaKnownRequestError(exception: unknown): exception is PrismaKnownRequestError {
+  return (
+    exception instanceof Error &&
+    exception.constructor.name === 'PrismaClientKnownRequestError' &&
+    typeof (exception as { code?: unknown }).code === 'string'
+  );
+}
 
 interface ErrorBody {
   statusCode: number;
@@ -84,7 +100,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       };
     }
 
-    if (exception instanceof Prisma.PrismaClientKnownRequestError) {
+    if (isPrismaKnownRequestError(exception)) {
       if (exception.code === 'P2002') {
         return {
           status: HttpStatus.CONFLICT,

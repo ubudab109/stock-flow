@@ -11,6 +11,12 @@ datasource db {
   provider = "postgresql"
 }
 
+// ---- SYNC-MARKER: models below are synced verbatim into schema.test.prisma
+// by prisma/setup-test-db.ts for the SQLite test database. Our schema uses no
+// Postgres-specific native types, so the same model definitions are valid
+// under both providers — do not add `@db.*` native attributes without
+// checking they also work on SQLite.
+
 /// A staff member. Each user is their own isolated workspace: they only ever
 /// see products/invoices they created.
 model User {
