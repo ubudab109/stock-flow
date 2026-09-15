@@ -43,7 +43,16 @@ Copy `apps/web/.env.example` to `apps/web/.env` to override `VITE_API_URL` if th
 ```bash
 pnpm build    # build all apps/packages
 pnpm lint     # lint all apps/packages
-pnpm test     # test all apps/packages
+pnpm test     # unit tests for all apps/packages
+```
+
+## Running the API's tests
+
+```bash
+cd apps/api
+cp .env.test.example .env.test   # separate DB so tests never touch dev data
+pnpm test          # unit tests (no DB required)
+pnpm test:e2e      # integration tests — auto-creates/migrates the test DB first
 ```
 
 ## Adding a new app or package
