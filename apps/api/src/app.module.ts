@@ -9,6 +9,7 @@ import { validateEnv } from './config/env.validation.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { ProductsModule } from './products/products.module.js';
+import { InvoicesModule } from './invoices/invoices.module.js';
 
 // The whole project shares one .env at the monorepo root (see .env.example
 // there) instead of a separate one per app — this file lives at
@@ -26,6 +27,7 @@ const rootEnvPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '
     PrismaModule,
     AuthModule,
     ProductsModule,
+    InvoicesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
