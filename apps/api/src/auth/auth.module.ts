@@ -9,6 +9,10 @@ import { PasswordService } from './password.service.js';
   imports: [JwtModule.register({})],
   controllers: [AuthController],
   providers: [AuthService, PasswordService, JwtAuthGuard],
-  exports: [JwtAuthGuard],
+  // JwtModule is re-exported too: any module that imports AuthModule to use
+  // JwtAuthGuard (e.g. ProductsModule) needs JwtService resolvable in its own
+  // scope, since @UseGuards(JwtAuthGuard) resolves the guard's dependencies
+  // in the *consuming* module's context, not AuthModule's.
+  exports: [JwtAuthGuard, JwtModule],
 })
 export class AuthModule {}
