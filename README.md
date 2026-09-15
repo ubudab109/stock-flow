@@ -76,9 +76,14 @@ The `api` container runs `prisma migrate deploy` automatically on startup, so a 
 docker compose exec api pnpm db:seed
 ```
 
-Run Test
+Run Integration Test
 ```bash
 docker compose exec api pnpm test:e2e
+```
+
+Run Unit Test
+```bash
+docker compose exec api pnpm test
 ```
 
 This is a secondary, from-scratch way to run the project (e.g. to prove it works with zero local Node setup) — day-to-day development is faster with `pnpm dev` against `docker compose up -d db` (just the database), since that gets hot reload instead of a rebuild-on-every-change container.
@@ -136,9 +141,10 @@ All authenticated routes read a JWT from an httpOnly cookie set by `/auth/login`
 - A stock-movement ledger (append-only, one row per increment/decrement with a reason) — currently `quantityOnHand` is just mutated in place, which is correct but leaves no audit trail.
 - Row-level locking (or Postgres `SELECT ... FOR UPDATE`) for true serialization of concurrent edits to the same invoice, beyond the stock-guard's atomic update.
 - A nicer invoice PDF (branding, line-item wrapping for long product names, multi-page support).
-- Playwright coverage for the frontend (everything in this submission was verified by actually driving the app in headless Chromium during development, but that verification isn't checked into the repo as a repeatable test suite).
+- Playwright coverage for the frontend.
 - A CI pipeline (lint + both test suites on every PR) and a deployed demo URL.
 - A citext-based (or raw `ILIKE`) case-insensitive search on Postgres, with the SQLite test path kept correct via a small provider-aware branch instead of the current lowest-common-denominator `contains`.
+- Setup Nodemon for hot-reload application
 
 ## AI usage
 
