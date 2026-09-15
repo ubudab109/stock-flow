@@ -4,6 +4,7 @@ import { useCurrentUser, useLogout } from '../auth/useAuth'
 const navItems = [
   { to: '/', label: 'Dashboard', end: true },
   { to: '/products', label: 'Products', end: false },
+  { to: '/invoices', label: 'Invoices', end: false },
 ]
 
 export function Layout() {
