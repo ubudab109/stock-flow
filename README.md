@@ -76,6 +76,11 @@ The `api` container runs `prisma migrate deploy` automatically on startup, so a 
 docker compose exec api pnpm db:seed
 ```
 
+Run Test
+```bash
+docker compose exec api pnpm test:e2e
+```
+
 This is a secondary, from-scratch way to run the project (e.g. to prove it works with zero local Node setup) — day-to-day development is faster with `pnpm dev` against `docker compose up -d db` (just the database), since that gets hot reload instead of a rebuild-on-every-change container.
 
 **Note:** the login cookie's `Secure` flag is tied to `WEB_ORIGIN` being `https://`, not to `NODE_ENV` — a `Secure` cookie is silently dropped by real browsers over plain HTTP, and this compose setup deploys over plain HTTP with no TLS termination (out of scope for a take-home bonus). Confirmed this actually matters by testing in a real browser, not just `curl`: the first version of this cookie logic passed every `curl` check while silently failing to persist a session in an actual browser.
