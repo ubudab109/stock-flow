@@ -161,4 +161,4 @@ Claude did the implementation: schema/API/business-logic design within the direc
 I corrected its process twice during the build: once when it shipped a backend-only slice without the matching UI, and once when its environment-file layout (a separate `.env` per app) was needlessly fragmented — both were fixed properly rather than patched around.
 
 ## Loom Short Explanation
-[Link](https://www.loom.com/share/8a893fd09a6443d79b3a1e7567af721b)
+[Loom Link Video](https://www.loom.com/share/8a893fd09a6443d79b3a1e7567af721b)
