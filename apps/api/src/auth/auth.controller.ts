@@ -1,6 +1,7 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, Res, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiCookieAuth, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import type { Response } from 'express';
 import type { AppConfig } from '../config/configuration.js';
 import { CurrentUser } from '../common/decorators/current-user.decorator.js';
@@ -24,6 +25,10 @@ export class AuthController {
     return this.authService.register(dto);
   }
 
+  // Stricter than the global default: 5 attempts per minute per IP, to slow
+  // down credential-stuffing / brute-force attempts against this endpoint
+  // specifically.
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(
@@ -35,7 +40,11 @@ export class AuthController {
     res.cookie(ACCESS_TOKEN_COOKIE, accessToken, {
       httpOnly: true,
       sameSite: 'lax',
-      secure: this.config.get('nodeEnv', { infer: true }) === 'production',
+      // Tied to whether the frontend origin is actually HTTPS, not NODE_ENV
+      // — a `Secure` cookie is silently dropped by real browsers over plain
+      // HTTP, which is exactly how the bonus docker-compose deployment (a
+      // "production" NODE_ENV, but no TLS) serves the app.
+      secure: this.config.get('webOrigin', { infer: true }).startsWith('https://'),
       expires: expiresAt,
       path: '/',
     });

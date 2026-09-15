@@ -3,17 +3,18 @@ import type { Product } from '@eterna/shared'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { ApiError } from '../../lib/api-client'
-import { decimalStringToMinor, minorToDecimalString } from '../../lib/money'
 import { useCreateProduct, useUpdateProduct } from '../../products/useProducts'
 
 const productSchema = z.object({
   sku: z.string().min(1, 'SKU is required').max(64),
   name: z.string().min(1, 'Name is required').max(200),
   description: z.string().max(2000).optional(),
+  // IDR is a zero-decimal currency — unit price is a whole-Rupiah integer,
+  // not a decimal amount (see lib/money.ts).
   unitPrice: z
     .string()
     .min(1, 'Price is required')
-    .refine((v) => !Number.isNaN(Number.parseFloat(v)) && Number.parseFloat(v) >= 0, 'Must be a non-negative number'),
+    .refine((v) => Number.isInteger(Number(v)) && Number(v) >= 0, 'Must be a non-negative whole number'),
   quantityOnHand: z
     .string()
     .min(1, 'Quantity is required')
@@ -45,7 +46,7 @@ export function ProductFormModal({ product, onClose }: ProductFormModalProps) {
           sku: product.sku,
           name: product.name,
           description: product.description ?? '',
-          unitPrice: minorToDecimalString(product.unitPrice),
+          unitPrice: String(product.unitPrice),
           quantityOnHand: String(product.quantityOnHand),
         }
       : { sku: '', name: '', description: '', unitPrice: '', quantityOnHand: '' },
@@ -56,7 +57,7 @@ export function ProductFormModal({ product, onClose }: ProductFormModalProps) {
       sku: values.sku,
       name: values.name,
       description: values.description || undefined,
-      unitPrice: decimalStringToMinor(values.unitPrice),
+      unitPrice: Number(values.unitPrice),
       quantityOnHand: Number(values.quantityOnHand),
     }
 
@@ -115,12 +116,12 @@ export function ProductFormModal({ product, onClose }: ProductFormModalProps) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label htmlFor="unitPrice" className="mb-1 block text-sm font-medium text-gray-700">
-                Unit price
+                Unit price (Rp)
               </label>
               <input
                 id="unitPrice"
                 type="number"
-                step="0.01"
+                step="1"
                 min="0"
                 className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
                 {...register('unitPrice')}
