@@ -48,8 +48,6 @@ describe('Invoices (e2e)', () => {
       .send({
         customerName: 'Acme Corp',
         items: [{ productId: widgetId, quantity: 2 }],
-        // Not part of CreateInvoiceDto — whitelist rejection proves the
-        // server never accepts client-sent totals (V2).
         total: 1,
       });
 

@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router-dom'
 import { StatusBadge } from '../../components/StatusBadge'
 import { useCancelInvoice, useInvoice, useIssueInvoice, usePayInvoice } from '../../invoices/useInvoices'
+import { API_URL } from '../../lib/api-client'
 import { formatMoney } from '../../lib/money'
 
 export function InvoiceDetailPage() {
@@ -37,7 +38,17 @@ export function InvoiceDetailPage() {
           <h1 className="font-mono text-2xl font-semibold text-gray-900">{invoice.invoiceNumber}</h1>
           <p className="mt-1 text-gray-500">{invoice.customerName}</p>
         </div>
-        <StatusBadge status={invoice.status} />
+        <div className="flex items-center gap-3">
+          <a
+            href={`${API_URL}/invoices/${invoice.id}/pdf`}
+            target="_blank"
+            rel="noreferrer"
+            className="text-sm font-medium text-indigo-600 hover:underline"
+          >
+            Download PDF
+          </a>
+          <StatusBadge status={invoice.status} />
+        </div>
       </div>
 
       <div className="mb-6 grid grid-cols-2 gap-4 text-sm">

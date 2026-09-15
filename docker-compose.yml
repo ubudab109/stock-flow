@@ -16,5 +16,43 @@ services:
       timeout: 5s
       retries: 10
 
+  # `api` and `web` containerize the whole app (bonus: "docker-compose up
+  # brings up app + database"). For day-to-day development, `pnpm dev`
+  # against `docker compose up -d db` (just the database) is faster —
+  # these two rebuild from source on every `docker compose up --build`.
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      # `db`, not localhost — containers reach Postgres via the compose
+      # network using the service name as hostname.
+      DATABASE_URL: postgresql://${POSTGRES_USER:-stockflow}:${POSTGRES_PASSWORD:-stockflow}@db:5432/${POSTGRES_DB:-stockflow}?schema=public
+      JWT_SECRET: ${JWT_SECRET:-dev-only-change-me}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      TAX_RATE_BPS: ${TAX_RATE_BPS:-1100}
+      WEB_ORIGIN: http://localhost:8080
+    ports:
+      - "3000:3000"
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        # The browser's URL for the API, not a Docker-internal hostname.
+        VITE_API_URL: http://localhost:3000
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "8080:80"
+
 volumes:
   stockflow-db-data:

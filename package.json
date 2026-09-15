@@ -16,7 +16,8 @@
     "db:up": "docker compose up -d db",
     "db:down": "docker compose down",
     "db:migrate": "pnpm --filter @eterna/api run prisma:migrate",
-    "db:studio": "pnpm --filter @eterna/api run prisma:studio"
+    "db:studio": "pnpm --filter @eterna/api run prisma:studio",
+    "db:seed": "pnpm --filter @eterna/api run db:seed"
   },
   "devDependencies": {
     "prettier": "^3.3.3",

@@ -1,0 +1,14 @@
+**/node_modules
+**/dist
+**/.turbo
+**/coverage
+.git
+.env
+.env.*
+!.env.example
+
+# Host-built, platform-specific artifacts — must never be copied into the
+# Linux build container (would contain Windows/macOS native binaries).
+apps/api/src/generated
+apps/api/prisma/test.db
+apps/api/prisma/schema.test.prisma
